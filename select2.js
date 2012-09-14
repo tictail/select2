@@ -564,6 +564,9 @@
                 this.destroy();
             }
 
+            this.required=opts.element.attr("required")!==undefined;
+            opts.element.removeAttr("required");
+
             this.enabled=true;
             this.container = this.createContainer();
 
@@ -667,6 +670,7 @@
                     .unbind(".select2")
                     .show();
             }
+            if (this.required) this.opts.element.attr("required", "required");
         },
 
         // abstract
@@ -1943,8 +1947,14 @@
             } else {
                 // we set this to " " instead of "" and later clear it on focus() because there is a firefox bug
                 // that does not properly render the caret when the field starts out blank
-                this.search.val(" ").width(10);
+                this.search.val("").width(10);
             }
+
+            this.search.removeAttr("required");
+            if (this.required && this.val().length == 0) {
+                this.search.attr("required", "required");
+            }
+
         },
 
         // multi
@@ -2022,11 +2032,10 @@
 
             if (this.opts.closeOnSelect) {
                 this.close();
-                this.search.width(10);
+                this.clearSearch();
             } else {
                 if (this.countSelectableResults()>0) {
-                    this.search.width(10);
-                    this.resizeSearch();
+                    this.clearSearch();
                     this.positionDropdown();
                 } else {
                     // if nothing left to select close
@@ -2108,6 +2117,8 @@
             }
             selected.remove();
             this.triggerChange({ removed: data });
+
+            this.clearSearch();
         },
 
         // multi
